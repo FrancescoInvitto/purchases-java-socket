@@ -1,5 +1,6 @@
 package it.unipr.desantisinvitto;
 
+import java.util.ArrayList;
 import java.util.Random;
 import java.net.Socket;
 import java.io.DataInputStream;
@@ -24,7 +25,6 @@ public class Server {
 				Socket socket = sSocket.accept();
 				System.out.println("Nuovo client connesso: " + socket);
 				ClientHandler clientHandler = new ClientHandler(socket);
-				
 				Thread thread = new Thread(clientHandler);
 				thread.start();
 			}

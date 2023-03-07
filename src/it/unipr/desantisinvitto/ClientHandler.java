@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class ClientHandler implements Runnable{
 	
@@ -13,14 +14,14 @@ public class ClientHandler implements Runnable{
 	private Socket socket;
 	private BufferedReader bufferedReader;
 	private BufferedWriter bufferedWriter;
-	public String clientName;
+	private static final int MAX_PRICE = 200;
+	private static final int MIN_PRICE = 10;
 	
 	public ClientHandler(Socket socket) {
 		try {
 			this.socket = socket;
 			this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
 			this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-			this.clientName = bufferedReader.readLine();
 			clientHandlers.add(this);
 		}
 		catch(Exception e) {
@@ -31,12 +32,14 @@ public class ClientHandler implements Runnable{
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-		String messageFromClient;
-		
+		Random random = new Random();
+		int price;
 		while(socket.isConnected()) {
 			try {
+				Thread.sleep(2000);
+				price = random.nextInt(MAX_PRICE-MIN_PRICE) + MIN_PRICE;
 				//messageFromClient = bufferedReader.readLine();
-				broadcastMessage("ciao");
+				broadcastMessage(price);
 			}
 			catch(Exception e) {
 				close(socket, bufferedWriter, bufferedReader);
@@ -46,14 +49,12 @@ public class ClientHandler implements Runnable{
 		
 	}
 	
-	public void broadcastMessage(String messageToSend) {
+	public void broadcastMessage(int price){
 		for(ClientHandler clientHandler : clientHandlers) {
 			try {
-				if(!clientHandler.clientName.equals(clientName)) {
-					clientHandler.bufferedWriter.write(messageToSend);
-					clientHandler.bufferedWriter.newLine();
-					clientHandler.bufferedWriter.flush();
-				}
+				clientHandler.bufferedWriter.write(Integer.toString(price));
+				clientHandler.bufferedWriter.newLine();
+				clientHandler.bufferedWriter.flush();
 			}
 			catch(Exception e) {
 				close(socket, bufferedWriter, bufferedReader);
