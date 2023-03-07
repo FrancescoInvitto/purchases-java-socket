@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.Random;
 
 public class Client {
-	private static final int MAX_PRICE = 200;
+	private static final int MAX_PRICE = 220;
 	private static final int MIN_PRICE = 10;
 	
 	private Socket socket;
