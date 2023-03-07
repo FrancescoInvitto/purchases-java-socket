@@ -33,13 +33,15 @@ public class ClientHandler implements Runnable{
 	public void run() {
 		// TODO Auto-generated method stub
 		Random random = new Random();
+		String messageFromClient;
 		int price;
 		while(socket.isConnected()) {
 			try {
 				Thread.sleep(2000);
 				price = random.nextInt(MAX_PRICE-MIN_PRICE) + MIN_PRICE;
-				//messageFromClient = bufferedReader.readLine();
 				broadcastMessage(price);
+				messageFromClient = bufferedReader.readLine();
+				System.out.println(messageFromClient + " " + socket);
 			}
 			catch(Exception e) {
 				close(socket, bufferedWriter, bufferedReader);

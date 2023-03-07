@@ -37,6 +37,8 @@ public class Client {
 					try {
 						msgFromServer = bufferedReader.readLine();
 						System.out.println(msgFromServer);
+						sendOffer();
+						
 					}
 					catch(Exception e) {
 						close(socket, bufferedWriter, bufferedReader);
@@ -44,6 +46,17 @@ public class Client {
 				}
 			}
 		}).start();
+	}
+	
+	public void sendOffer() {
+		try {
+			bufferedWriter.write("prezzo ricevuto");
+			bufferedWriter.newLine();
+			bufferedWriter.flush();
+		}
+		catch (Exception e){
+			close(socket, bufferedWriter, bufferedReader);
+		}
 	}
 	
 	public void close(Socket socket, BufferedWriter bufferedWriter, BufferedReader bufferedReader) {
