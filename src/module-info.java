@@ -1,0 +1,9 @@
+/**
+ * 
+ */
+/**
+ * @author desan
+ *
+ */
+module acquistiSocket {
+}
