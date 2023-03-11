@@ -22,19 +22,22 @@ public class Server {
 	private ServerSocket socket;
 	private ThreadPoolExecutor pool;
 	private ArrayList<ServerThread> serverThreads;
+	private PriceGeneratorThread generator;
 	
 	public Server() throws IOException{
 		this.socket = new ServerSocket(SPORT);
 		this.serverThreads = new ArrayList<>();
+		this.generator = new PriceGeneratorThread(this);
 	}
 	
 	private void run() {
 		this.pool = new ThreadPoolExecutor(COREPOOL, MAXPOOL, IDLETIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
-		while(serverThreads.size()<3) {
+		this.pool.execute(generator);
+		while(serverThreads.size()<0) {
 			System.out.println("Clients connected: " + serverThreads.size());
 			try {
 				Socket s = this.socket.accept();
-				serverThreads.add(new ServerThread(this, s));
+				serverThreads.add(new ServerThread(this, s, this.generator));
 			}
 			catch(Exception e) {
 				break;
@@ -47,7 +50,7 @@ public class Server {
 			System.out.println("Clients connected: " + serverThreads.size());
 			try {
 				Socket s = this.socket.accept();
-				ServerThread serverThread = new ServerThread(this, s);
+				ServerThread serverThread = new ServerThread(this, s, generator);
 				serverThreads.add(serverThread);
 				this.pool.execute(serverThread);
 			}

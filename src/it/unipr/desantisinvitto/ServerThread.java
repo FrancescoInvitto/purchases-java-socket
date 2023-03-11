@@ -14,11 +14,13 @@ public class ServerThread implements Runnable{
 	private static final int MIN_PRICE = 10;
 	
 	private Server server;
+	private PriceGeneratorThread generator;
 	private Socket socket;
 	
-	public ServerThread(final Server s, final Socket c) {
+	public ServerThread(final Server s, final Socket c, final PriceGeneratorThread g) {
 		this.server = s;
 		this.socket = c;
+		this.generator = g;
 	}
 	
 	@Override
@@ -44,13 +46,14 @@ public class ServerThread implements Runnable{
 			try {
 				Thread.sleep(2000);
 				price = random.nextInt(MAX_PRICE-MIN_PRICE) + MIN_PRICE;
+				System.out.println("Prezzo recuperato dal generatore " + generator.getPrice());
 				
 				if(os==null) {
 					os = new ObjectOutputStream(new BufferedOutputStream(this.socket.getOutputStream()));
 				}
 				
-				Price ps = new Price(price);
-				System.out.format("Thread %s sends: %s to its client%n", id, ps.getPrice());
+				Price ps = new Price(this.generator.getPrice());
+				System.out.format("Thread %s sends: %s to its client%n", id, this.generator.getPrice());
 				os.writeObject(ps);
 				os.flush();
 				
@@ -61,7 +64,7 @@ public class ServerThread implements Runnable{
 					client_offer = oc.getOffer();
 					System.out.format("Thread %s receives: %s from its client%n", id, client_offer);
 					
-					if(client_offer>=price) { //redundant control
+					if(client_offer>=this.generator.getPrice()) {
 						os.writeObject(1);
 						os.flush();
 					}
@@ -80,7 +83,8 @@ public class ServerThread implements Runnable{
 				
 				if(o instanceof Boolean) {
 					if(o.equals(false)) {
-						if(this.server.getPool().getActiveCount()==1) {
+						if(this.server.getPool().getActiveCount()==2) { // vuol dire che rimangono l'ultimo client e il thread che genera il prezzo
+							this.generator.setStop(true);
 							this.server.close();
 						}
 						this.server.getList().remove(this);
@@ -97,5 +101,12 @@ public class ServerThread implements Runnable{
 		}
 	}
 	
-	
+	public void close() {
+		try {
+			this.socket.close();
+		}
+		catch(Exception e) {
+			e.printStackTrace();
+		}
+	}
 }
