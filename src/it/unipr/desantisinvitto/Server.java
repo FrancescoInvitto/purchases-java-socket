@@ -21,19 +21,23 @@ public class Server {
 	
 	private ServerSocket socket;
 	private ThreadPoolExecutor pool;
-	private ArrayList<ServerThread> serverThreads;
+	//private ArrayList<ServerThread> serverThreads;
 	private PriceGeneratorThread generator;
+	private volatile boolean start;
 	
 	public Server() throws IOException{
 		this.socket = new ServerSocket(SPORT);
-		this.serverThreads = new ArrayList<>();
+		//this.serverThreads = new ArrayList<>();
 		this.generator = new PriceGeneratorThread(this);
+		this.start = false;
 	}
 	
 	private void run() {
 		this.pool = new ThreadPoolExecutor(COREPOOL, MAXPOOL, IDLETIME, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
 		this.pool.execute(generator);
-		while(serverThreads.size()<0) {
+		int count = 0;
+		/*
+		while(serverThreads.size()<3) {
 			System.out.println("Clients connected: " + serverThreads.size());
 			try {
 				Socket s = this.socket.accept();
@@ -45,14 +49,18 @@ public class Server {
 		}
 		for(ServerThread serverThread : serverThreads) {
 			this.pool.execute(serverThread);
-		}
+		}*/
 		while(true) {
-			System.out.println("Clients connected: " + serverThreads.size());
+			System.out.println("Clients connected: " + count);
 			try {
 				Socket s = this.socket.accept();
-				ServerThread serverThread = new ServerThread(this, s, generator);
-				serverThreads.add(serverThread);
+				ServerThread serverThread = new ServerThread(this, s, this.generator);
+				//serverThreads.add(serverThread);
+				count++;
 				this.pool.execute(serverThread);
+				if(count==3) {
+					this.start = true;
+				}
 			}
 			catch(Exception e) {
 				break;
@@ -65,9 +73,10 @@ public class Server {
 		return this.pool;
 	}
 	
+	/*
 	public ArrayList<ServerThread> getList(){
 		return this.serverThreads;
-	}
+	}*/
 	
 	public void close() {
 		try {
@@ -81,5 +90,9 @@ public class Server {
 	public static void main(String[] args) throws IOException{
 		new Server().run();
 		System.out.println("Connection closed");
+	}
+	
+	public boolean getStart() {
+		return this.start;
 	}
 }

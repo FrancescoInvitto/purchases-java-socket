@@ -1,15 +1,8 @@
 package it.unipr.desantisinvitto;
 
 import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.ObjectInput;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.OutputStreamWriter;
-import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Random;
 
@@ -21,7 +14,7 @@ public class Client {
 	private static final int MIN_PRICE = 10;
 	private int COUNT = 3;
 	
-	public void run() {
+	public void run(){
 		try {
 			Socket client = new Socket(SHOST, SPORT);
 			ObjectOutputStream os = new ObjectOutputStream(client.getOutputStream());
@@ -61,8 +54,7 @@ public class Client {
 					}
 					os.writeObject(oc);
 					os.flush();
-				}
-				
+				}		
 								
 				o = is.readObject();
 				
@@ -84,11 +76,13 @@ public class Client {
 				}
 				os.writeObject(true);
 				os.flush();
+				
+				Thread.sleep(1000);
 			}
 			
 			client.close();
 		}
-		catch(IOException | ClassNotFoundException e){
+		catch(Exception e){
 			e.printStackTrace();
 		}
 	}
