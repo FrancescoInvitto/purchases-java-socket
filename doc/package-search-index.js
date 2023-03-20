@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"m":"acquistiSocket","l":"it.unipr.desantisinvitto"}];updateSearchResults();
