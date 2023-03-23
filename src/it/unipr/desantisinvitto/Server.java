@@ -56,7 +56,9 @@ public class Server {
 				clientsCount++;
 				this.pool.execute(serverThread);
 				
-				if(clientsCount == MIN_CLIENTS) {
+				// if the minimum number of clients has been reached, threaded servers can communicate with connected clients
+				
+				if(clientsCount == MIN_CLIENTS) { 
 					this.start = true;
 				}
 				
