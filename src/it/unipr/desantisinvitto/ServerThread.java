@@ -62,7 +62,6 @@ public class ServerThread implements Runnable{
 		while(true) {
 			try {
 				if(this.server.getStart()) {
-					System.out.println("-----------------------------------------");
 					
 					price = this.generator.getPrice();	//retrieves the current price
 					System.out.println("Current product price: " + price);
@@ -84,24 +83,28 @@ public class ServerThread implements Runnable{
 						Offer oc = (Offer) o;
 						clientOffer = oc.getValue();	//retrieves the value of the client's offer
 						
-						System.out.format("Thread %s receives offer: %s from its client%n", id, clientOffer);
-						
-						price = this.generator.getPrice(); //gets again the price, in order to check if it has not changed
-
-						if(clientOffer >= price) {
-							os.writeObject(ACCEPTED);
-							os.flush();
-						}
-						else if (clientOffer == 0){	//the client has not made an offer
+						if (clientOffer == 0){	//the client has not made an offer, this write will be ignored by the relative client
 							os.writeObject(NOT_SET);
 							os.flush();
 						}
 						else {
-							os.writeObject(REJECTED);
-							os.flush();
+							System.out.format("Thread %s receives offer: %s from its client%n", id, clientOffer);
+							
+							price = this.generator.getPrice(); //gets again the price, in order to check if it has not changed
+							
+							System.out.println("Current product price after receiving the offer: " + price);
+
+							if(clientOffer >= price) {
+								System.out.format("Offer accepted by Thread %s%n", id);
+								os.writeObject(ACCEPTED);
+								os.flush();
+							}
+							else {
+								System.out.format("Offer rejected by Thread %s%n", id);
+								os.writeObject(REJECTED);
+								os.flush();
+							}
 						}
-						
-						System.out.println("-----------------------------------------");
 
 					}
 

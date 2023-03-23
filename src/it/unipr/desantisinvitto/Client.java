@@ -82,6 +82,7 @@ public class Client {
 					if(outcome == 1) {
 						System.out.println("Offer accepted!");
 						purchCount++;
+						System.out.println("Current number of purchases: " + purchCount);
 					}
 					else if(outcome == 0) {
 						System.out.println("Offer rejected!");
@@ -91,12 +92,12 @@ public class Client {
 				System.out.println("---------------------------------------");
 				
 				if(purchCount == PURCHASES) {
-					os.writeObject(false);	//the client informs the server it has completed all its purchases
+					os.writeObject(false);	//the client informs the server thread it has completed all its purchases
 					os.flush();
 					break;
 				}
 				
-				os.writeObject(true);
+				os.writeObject(true); //the client informs the server thread that continue the purchases
 				os.flush();
 				
 				Thread.sleep(1000);
